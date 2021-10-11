@@ -1,0 +1,38 @@
+version: "3"
+
+services:
+  postgres-compose: # Instância do PostgreSQL
+    image: postgres
+    restart: always
+    environment: # Variaveis de ambiente para configuração do container
+      POSTGRES_DB: "DB_EOC"
+      POSTGRES_USER: "eliezer"
+      POSTGRES_PASSWORD: "Eliezer123"
+    ports:
+      - "15432:5432"
+    # Especifico volume para postgres-compose,
+    # indica o diretório em que serão gravados os arquivos de dados
+    volumes:
+      - ./postgres-data:/var/lib/postgresql/data
+    networks:
+      - postgres-compose-network
+
+  # Container que para a execução do pgAdmin 4
+  pgadmin-compose:
+    image: dpage/pgadmin4
+    restart: always
+    environment: # Variaveis de ambiente para configuração do container
+      PGADMIN_DEFAULT_EMAIL: "eliezer@eliezer.com.br"
+      PGADMIN_DEFAULT_PASSWORD: "Eliezer123"
+    ports:
+      - "16543:80"
+    depends_on:
+      - postgres-compose
+    networks:
+      - postgres-compose-network
+
+# A comunicação entre os containers pgadmin-compose e postgres-compose
+# ocorrerá por meio da network postgres-compose-network
+networks:
+  postgres-compose-network:
+    driver: bridge
